@@ -12,7 +12,8 @@
             --accent: #3b82f6;
             --accent-hover: #2563eb;
             --danger: #ef4444;
-            --grid-border: rgba(255, 255, 255, 0.15);
+            --grid-border: rgba(255, 255, 255, 0.2);
+            --size: 16;
         }
 
         body {
@@ -24,14 +25,14 @@
             align-items: center;
             min-height: 100vh;
             margin: 0;
-            padding: 20px;
+            padding: 15px;
             user-select: none;
             box-sizing: border-box;
+            overscroll-behavior: none;
         }
 
-        h1 { margin: 0 0 15px 0; font-weight: 800; text-align: center; }
+        h1 { margin: 0 0 15px 0; font-weight: 800; text-align: center; font-size: 1.8rem; }
         
-        /* Responsive Layout */
         .layout {
             display: flex;
             flex-direction: row;
@@ -48,11 +49,12 @@
             gap: 15px;
             flex: 1;
             max-width: 600px;
+            width: 100%;
         }
 
         .toolbar {
             background-color: var(--panel-bg);
-            padding: 12px 15px;
+            padding: 12px;
             border-radius: 12px;
             display: flex;
             gap: 10px;
@@ -61,7 +63,13 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
         }
 
-        .tool-group { display: flex; align-items: center; gap: 5px; }
+        .tool-group { 
+            display: flex; 
+            align-items: center; 
+            gap: 6px; 
+            padding: 0 5px;
+        }
+        .tool-group.divider { border-left: 1px solid #444; }
 
         input[type="color"] {
             -webkit-appearance: none;
@@ -74,7 +82,7 @@
             background: none;
         }
         input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
-        input[type="color"]::-webkit-color-swatch { border: none; border-radius: 8px; }
+        input[type="color"]::-webkit-color-swatch { border: 2px solid #555; border-radius: 8px; }
 
         select, button {
             background-color: #333;
@@ -83,7 +91,7 @@
             padding: 8px 12px;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 0.9rem;
+            font-size: 1rem;
             transition: all 0.2s;
             display: flex;
             align-items: center;
@@ -96,10 +104,10 @@
         button.primary { background-color: var(--accent); border-color: var(--accent); font-weight: bold; }
         button.primary:hover { background-color: var(--accent-hover); }
 
-        /* Canvas & Grid */
         .canvas-container {
+            position: relative;
             width: 100%;
-            aspect-ratio: 1; /* Keeps it perfectly square responsively */
+            aspect-ratio: 1;
             background-image: 
                 linear-gradient(45deg, #ccc 25%, transparent 25%), 
                 linear-gradient(135deg, #ccc 25%, transparent 25%),
@@ -115,28 +123,29 @@
             touch-action: none; 
         }
 
-        #pixel-canvas { 
-            display: grid; 
-            width: 100%; 
+        canvas {
+            width: 100%;
             height: 100%;
+            display: block;
+            image-rendering: pixelated;
         }
 
-        .pixel {
-            background-color: transparent;
-            border: 1px solid var(--grid-border);
-            box-sizing: border-box;
-            cursor: crosshair;
+        .grid-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            pointer-events: none;
+            background-size: calc(100% / var(--size)) calc(100% / var(--size));
+            background-image: 
+                linear-gradient(to right, var(--grid-border) 1px, transparent 1px),
+                linear-gradient(to bottom, var(--grid-border) 1px, transparent 1px);
         }
+        .hide-grid .grid-overlay { display: none; }
 
-        /* Toggle Grid Off */
-        .hide-grid .pixel { border-color: transparent !important; }
-
-        /* Gallery Styles */
         .gallery-container {
             background-color: var(--panel-bg);
             padding: 15px;
             border-radius: 12px;
-            width: 240px;
+            width: 260px;
             height: fit-content;
             max-height: 80vh;
             overflow-y: auto;
@@ -145,7 +154,6 @@
 
         .gallery-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 10px; margin-bottom: 15px;}
         .gallery-header h3 { margin: 0; font-size: 1.1rem; }
-        
         .gallery-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
         .gallery-card {
@@ -156,9 +164,7 @@
             border: 1px solid #444;
             transition: border-color 0.2s;
         }
-
         .gallery-card:hover { border-color: var(--accent); }
-
         .gallery-item {
             width: 100%;
             aspect-ratio: 1;
@@ -168,34 +174,30 @@
             background-image: linear-gradient(45deg, #ccc 25%, transparent 25%), linear-gradient(135deg, #ccc 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #ccc 75%), linear-gradient(135deg, transparent 75%, #ccc 75%);
             background-size: 8px 8px;
             background-position: 0 0, 4px 0, 4px -4px, 0px 4px;
-            image-rendering: pixelated; /* Keeps thumbnails crisp */
+            image-rendering: pixelated;
         }
-
         .btn-delete {
             position: absolute;
-            top: -5px;
-            right: -5px;
+            top: -5px; right: -5px;
             background-color: var(--danger);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 22px;
-            height: 22px;
-            font-size: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            color: white; border: none; border-radius: 50%;
+            width: 22px; height: 22px; font-size: 12px;
+            cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.5);
         }
 
-        /* Mobile Adjustments */
         @media (max-width: 768px) {
             .layout { flex-direction: column; align-items: center; }
             .gallery-container { width: 100%; max-width: 600px; }
             .gallery-grid { grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); }
-            .toolbar { padding: 10px; }
+            .toolbar { padding: 8px; gap: 5px; }
+            .tool-group { padding: 0 2px; }
+            button, select { padding: 6px 10px; font-size: 0.9rem; }
+            #btn-fullscreen { display: flex; }
+            h1 { font-size: 1.4rem; margin-bottom: 10px; }
         }
+
+        #btn-fullscreen { display: none; }
+        @media (max-width: 768px) { #btn-fullscreen { display: flex; } }
     </style>
 </head>
 <body>
@@ -210,29 +212,33 @@
                         <option value="8">8x8</option>
                         <option value="16" selected>16x16</option>
                         <option value="32">32x32</option>
+                        <option value="64">64x64</option>
                     </select>
                 </div>
-                <div class="tool-group">
-                    <input type="color" id="color-picker" value="#3b82f6" title="Pick Color">
+                <div class="tool-group divider">
+                    <input type="color" id="color-picker" value="#000000" title="Pick Color">
                 </div>
-                <div class="tool-group">
-                    <button id="btn-draw" class="active" title="Draw">✏️</button>
-                    <button id="btn-fill" title="Fill Bucket">🪣</button>
-                    <button id="btn-erase" title="Eraser">🧽</button>
+                <div class="tool-group divider">
+                    <button id="btn-draw" class="active" title="Brush (B)">✏️</button>
+                    <button id="btn-fill" title="Fill Bucket (G)">🪣</button>
+                    <button id="btn-erase" title="Eraser (E)">🧽</button>
+                    <button id="btn-picker" title="Eyedropper (I)">💧</button>
                 </div>
-                <div class="tool-group" style="border-left: 1px solid #444; padding-left: 10px;">
-                    <button id="btn-undo" title="Undo" disabled>↩️</button>
-                    <button id="btn-redo" title="Redo" disabled>↪️</button>
-                    <button id="btn-grid" title="Toggle Grid">🕸️</button>
+                <div class="tool-group divider">
+                    <button id="btn-undo" title="Undo (Ctrl+Z)" disabled>↩️</button>
+                    <button id="btn-redo" title="Redo (Ctrl+Y)" disabled>↪️</button>
+                    <button id="btn-grid" class="active" title="Toggle Grid">🕸️</button>
                 </div>
-                <div class="tool-group" style="border-left: 1px solid #444; padding-left: 10px;">
+                <div class="tool-group divider">
                     <button id="btn-clear" title="Clear Canvas">🗑️</button>
                     <button id="btn-export" class="primary" title="Export PNG">⬇️ PNG</button>
+                    <button id="btn-fullscreen" title="Fullscreen">📱</button>
                 </div>
             </div>
 
             <div class="canvas-container" id="canvas-wrapper">
-                <div id="pixel-canvas"></div>
+                <canvas id="pixel-canvas"></canvas>
+                <div class="grid-overlay" id="grid-overlay"></div>
             </div>
         </div>
 
@@ -246,8 +252,8 @@
     </div>
 
     <script>
-        // --- Core Elements ---
         const canvas = document.getElementById('pixel-canvas');
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
         const wrapper = document.getElementById('canvas-wrapper');
         const sizePicker = document.getElementById('size-picker');
         const colorPicker = document.getElementById('color-picker');
@@ -257,53 +263,43 @@
             draw: document.getElementById('btn-draw'),
             fill: document.getElementById('btn-fill'),
             erase: document.getElementById('btn-erase'),
+            picker: document.getElementById('btn-picker'),
             undo: document.getElementById('btn-undo'),
             redo: document.getElementById('btn-redo'),
             grid: document.getElementById('btn-grid')
         };
 
-        // --- State Variables ---
+        let size = 16;
+        let pixelData = [];
         let isDrawing = false;
         let currentMode = 'draw'; 
-        let currentArtId = null; // Tracks if we are editing saved art
-        let stateChangedSinceLastSave = false; // Tracks if an action was performed
+        let currentArtId = null; 
+        let stateChangedSinceLastSave = false; 
 
-        // --- History Stack (Undo/Redo) ---
         let undoStack = [];
         let redoStack = [];
         const MAX_HISTORY = 30;
 
         function saveState() {
-            const pixels = Array.from(canvas.children).map(p => p.style.backgroundColor || 'transparent');
-            undoStack.push(pixels);
+            undoStack.push([...pixelData]);
             if (undoStack.length > MAX_HISTORY) undoStack.shift();
-            redoStack = []; // Clear redo stack on new action
+            redoStack = []; 
             updateHistoryButtons();
-        }
-
-        function restoreState(pixels) {
-            Array.from(canvas.children).forEach((pixel, i) => {
-                pixel.style.backgroundColor = pixels[i] || 'transparent';
-            });
         }
 
         function undo() {
             if (undoStack.length === 0) return;
-            const currentState = Array.from(canvas.children).map(p => p.style.backgroundColor || 'transparent');
-            redoStack.push(currentState);
-            
-            const previousState = undoStack.pop();
-            restoreState(previousState);
+            redoStack.push([...pixelData]);
+            pixelData = undoStack.pop();
+            renderCanvas();
             updateHistoryButtons();
         }
 
         function redo() {
             if (redoStack.length === 0) return;
-            const currentState = Array.from(canvas.children).map(p => p.style.backgroundColor || 'transparent');
-            undoStack.push(currentState);
-            
-            const nextState = redoStack.pop();
-            restoreState(nextState);
+            undoStack.push([...pixelData]);
+            pixelData = redoStack.pop();
+            renderCanvas();
             updateHistoryButtons();
         }
 
@@ -315,126 +311,149 @@
         btns.undo.addEventListener('click', undo);
         btns.redo.addEventListener('click', redo);
 
-        // --- Tools & UI ---
         function setMode(mode) {
             currentMode = mode;
-            ['draw', 'fill', 'erase'].forEach(m => btns[m].classList.remove('active'));
+            ['draw', 'fill', 'erase', 'picker'].forEach(m => btns[m].classList.remove('active'));
             btns[mode].classList.add('active');
         }
+        
         btns.draw.addEventListener('click', () => setMode('draw'));
         btns.fill.addEventListener('click', () => setMode('fill'));
         btns.erase.addEventListener('click', () => setMode('erase'));
+        btns.picker.addEventListener('click', () => setMode('picker'));
 
-        // Toggle Grid
         btns.grid.addEventListener('click', () => {
-            canvas.classList.toggle('hide-grid');
+            wrapper.classList.toggle('hide-grid');
             btns.grid.classList.toggle('active');
         });
 
-        // Initialize App
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey || e.metaKey) {
+                if (e.key === 'z') { e.preventDefault(); undo(); }
+                if (e.key === 'y') { e.preventDefault(); redo(); }
+            } else {
+                if (e.key.toLowerCase() === 'b') setMode('draw');
+                if (e.key.toLowerCase() === 'g') setMode('fill');
+                if (e.key.toLowerCase() === 'e') setMode('erase');
+                if (e.key.toLowerCase() === 'i') setMode('picker');
+            }
+        });
+
         function initCanvas(savedPixels = null, loadedId = null) {
-            canvas.innerHTML = '';
-            const size = parseInt(sizePicker.value);
-            
-            canvas.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
-            canvas.style.gridTemplateRows = `repeat(${size}, 1fr)`;
+            size = parseInt(sizePicker.value);
+            canvas.width = size;
+            canvas.height = size;
+            document.documentElement.style.setProperty('--size', size);
 
-            for (let i = 0; i < size * size; i++) {
-                const pixel = document.createElement('div');
-                pixel.classList.add('pixel');
-                pixel.dataset.index = i;
-                
-                if (savedPixels && savedPixels[i]) {
-                    pixel.style.backgroundColor = savedPixels[i];
-                }
-
-                pixel.addEventListener('mousedown', (e) => { e.preventDefault(); handleInteract(pixel); });
-                pixel.addEventListener('mouseenter', (e) => { if(isDrawing) handleInteract(pixel); });
-                canvas.appendChild(pixel);
+            if (savedPixels && savedPixels.length === size * size) {
+                pixelData = [...savedPixels];
+            } else {
+                pixelData = new Array(size * size).fill(null);
             }
 
-            // Reset History on new canvas
             undoStack = [];
             redoStack = [];
-            currentArtId = loadedId; // Set current ID if loaded from gallery
+            currentArtId = loadedId; 
             updateHistoryButtons();
+            renderCanvas();
         }
 
-        // --- Drawing Engine ---
-        wrapper.addEventListener('mousedown', () => { isDrawing = true; saveState(); stateChangedSinceLastSave = false; });
-        window.addEventListener('mouseup', () => { if(isDrawing && !stateChangedSinceLastSave) undoStack.pop(); isDrawing = false; });
+        function renderCanvas() {
+            ctx.clearRect(0, 0, size, size);
+            for (let i = 0; i < pixelData.length; i++) {
+                if (pixelData[i]) {
+                    const x = i % size;
+                    const y = Math.floor(i / size);
+                    ctx.fillStyle = pixelData[i];
+                    ctx.fillRect(x, y, 1, 1);
+                }
+            }
+        }
 
-        // Mobile Drag Support
+        function getCoords(e) {
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            
+            const x = Math.floor((clientX - rect.left) / (rect.width / size));
+            const y = Math.floor((clientY - rect.top) / (rect.height / size));
+            
+            return { x, y };
+        }
+
+        function handleInteract(e) {
+            const { x, y } = getCoords(e);
+            if (x < 0 || x >= size || y < 0 || y >= size) return;
+            
+            const index = y * size + x;
+            
+            if (currentMode === 'picker') {
+                if (pixelData[index]) colorPicker.value = pixelData[index];
+                setMode('draw');
+                return;
+            }
+
+            const newColor = currentMode === 'erase' ? null : colorPicker.value;
+            
+            if (pixelData[index] !== newColor) {
+                if (!stateChangedSinceLastSave) {
+                    saveState();
+                    stateChangedSinceLastSave = true;
+                }
+
+                if (currentMode === 'fill') {
+                    floodFill(x, y, newColor);
+                } else {
+                    pixelData[index] = newColor;
+                }
+                renderCanvas();
+            }
+        }
+
+        wrapper.addEventListener('mousedown', (e) => { 
+            isDrawing = true; 
+            stateChangedSinceLastSave = false; 
+            handleInteract(e); 
+        });
+        window.addEventListener('mouseup', () => { isDrawing = false; });
+        wrapper.addEventListener('mousemove', (e) => { if(isDrawing) handleInteract(e); });
+
         wrapper.addEventListener('touchstart', (e) => {
             e.preventDefault();
             isDrawing = true;
-            saveState();
             stateChangedSinceLastSave = false;
-            const target = document.elementFromPoint(e.touches[0].clientX, e.touches[0].clientY);
-            if(target && target.classList.contains('pixel')) handleInteract(target);
-        });
+            handleInteract(e);
+        }, { passive: false });
+        
         wrapper.addEventListener('touchmove', (e) => {
             e.preventDefault();
-            if(!isDrawing) return;
-            const touch = e.touches[0];
-            const target = document.elementFromPoint(touch.clientX, touch.clientY);
-            if(target && target.classList.contains('pixel')) handleInteract(target);
-        });
-        window.addEventListener('touchend', () => { if(isDrawing && !stateChangedSinceLastSave) undoStack.pop(); isDrawing = false; });
+            if(isDrawing) handleInteract(e);
+        }, { passive: false });
+        
+        window.addEventListener('touchend', () => { isDrawing = false; });
 
-        function handleInteract(pixel) {
-            stateChangedSinceLastSave = true; // Confirms an actual action happened during the click/drag
-            if (currentMode === 'draw') {
-                pixel.style.backgroundColor = colorPicker.value;
-            } else if (currentMode === 'erase') {
-                pixel.style.backgroundColor = 'transparent';
-            } else if (currentMode === 'fill') {
-                floodFill(parseInt(pixel.dataset.index), colorPicker.value);
+        function floodFill(startX, startY, newColorHex) {
+            const targetColor = pixelData[startY * size + startX];
+            if (targetColor === newColorHex) return;
+
+            const queue = [[startX, startY]];
+            
+            while (queue.length > 0) {
+                const [x, y] = queue.shift();
+                const idx = y * size + x;
+
+                if (x < 0 || x >= size || y < 0 || y >= size) continue;
+                if (pixelData[idx] !== targetColor) continue;
+
+                pixelData[idx] = newColorHex;
+
+                queue.push([x + 1, y]);
+                queue.push([x - 1, y]);
+                queue.push([x, y + 1]);
+                queue.push([x, y - 1]);
             }
         }
 
-        // --- Flood Fill Algorithm ---
-        function floodFill(startIndex, newColorHex) {
-            const size = parseInt(sizePicker.value);
-            const pixels = Array.from(canvas.children);
-            
-            const dummy = document.createElement('div');
-            dummy.style.backgroundColor = newColorHex;
-            const targetRGB = dummy.style.backgroundColor; 
-            
-            const startColor = pixels[startIndex].style.backgroundColor || 'transparent';
-            if (startColor === targetRGB) return;
-
-            const queue = [startIndex];
-            const visited = new Set([startIndex]);
-
-            while(queue.length > 0) {
-                const current = queue.shift();
-                pixels[current].style.backgroundColor = targetRGB;
-
-                const x = current % size;
-                const y = Math.floor(current / size);
-
-                const neighbors = [
-                    { nx: x, ny: y - 1, idx: current - size },
-                    { nx: x, ny: y + 1, idx: current + size },
-                    { nx: x - 1, ny: y, idx: current - 1 },
-                    { nx: x + 1, ny: y, idx: current + 1 }
-                ];
-
-                for (let {nx, ny, idx} of neighbors) {
-                    if (nx >= 0 && nx < size && ny >= 0 && ny < size) {
-                        const neighborColor = pixels[idx].style.backgroundColor || 'transparent';
-                        if (neighborColor === startColor && !visited.has(idx)) {
-                            visited.add(idx);
-                            queue.push(idx);
-                        }
-                    }
-                }
-            }
-        }
-
-        // --- CRUD Gallery Logic ---
         function loadGallery() {
             galleryDiv.innerHTML = '';
             const savedArt = JSON.parse(localStorage.getItem('pixelGallery')) || [];
@@ -448,22 +467,17 @@
                 img.classList.add('gallery-item');
                 img.title = `Size: ${art.size}x${art.size}`;
                 
-                // Read (Load Art)
                 img.addEventListener('click', () => {
                     sizePicker.value = art.size;
-                    initCanvas(art.pixels, art.id); // Pass ID to know what we are editing
+                    initCanvas(art.pixels, art.id); 
                 });
 
-                // Delete
                 const delBtn = document.createElement('button');
                 delBtn.classList.add('btn-delete');
                 delBtn.innerHTML = '✖';
-                delBtn.title = 'Delete';
                 delBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    if(confirm('Delete this artwork?')) {
-                        deleteArt(art.id);
-                    }
+                    if(confirm('Delete this artwork?')) deleteArt(art.id);
                 });
                 
                 card.appendChild(img);
@@ -472,84 +486,82 @@
             });
         }
 
-        // Create / Update
         document.getElementById('btn-save').addEventListener('click', () => {
-            const size = parseInt(sizePicker.value);
-            const pixels = Array.from(canvas.children).map(p => p.style.backgroundColor || 'transparent');
-            const dataUrl = generatePNGDataURL(size);
-            
+            const dataUrl = generateHighResPNG();
             let savedArt = JSON.parse(localStorage.getItem('pixelGallery')) || [];
             
             if (currentArtId) {
-                // Update existing
                 const index = savedArt.findIndex(art => art.id === currentArtId);
-                if (index > -1) {
-                    if(confirm('Overwrite existing save? (Cancel to save as new)')) {
-                        savedArt[index] = { id: currentArtId, size, pixels, dataUrl };
-                    } else {
-                        currentArtId = Date.now();
-                        savedArt.push({ id: currentArtId, size, pixels, dataUrl });
-                    }
+                if (index > -1 && confirm('Overwrite existing save? (Cancel to save as new)')) {
+                    savedArt[index] = { id: currentArtId, size, pixels: [...pixelData], dataUrl };
+                } else {
+                    currentArtId = Date.now();
+                    savedArt.push({ id: currentArtId, size, pixels: [...pixelData], dataUrl });
                 }
             } else {
-                // Create new
                 currentArtId = Date.now();
-                savedArt.push({ id: currentArtId, size, pixels, dataUrl });
+                savedArt.push({ id: currentArtId, size, pixels: [...pixelData], dataUrl });
             }
             
             localStorage.setItem('pixelGallery', JSON.stringify(savedArt));
             loadGallery();
         });
 
-        // Delete function
         function deleteArt(id) {
             let savedArt = JSON.parse(localStorage.getItem('pixelGallery')) || [];
             savedArt = savedArt.filter(art => art.id !== id);
             localStorage.setItem('pixelGallery', JSON.stringify(savedArt));
-            if(currentArtId === id) currentArtId = null; // Clear if currently editing
+            if(currentArtId === id) currentArtId = null; 
             loadGallery();
         }
 
-        // --- Export & Reset ---
-        function generatePNGDataURL(size) {
+        function generateHighResPNG() {
             const exportCanvas = document.createElement('canvas');
-            const ctx = exportCanvas.getContext('2d');
-            const scale = Math.max(10, 480 / size); // Better resolution mapping
+            const scale = Math.max(10, 480 / size); 
             exportCanvas.width = size * scale;
             exportCanvas.height = size * scale;
-
-            const pixels = document.querySelectorAll('.pixel');
-            pixels.forEach((pixel, index) => {
-                const color = pixel.style.backgroundColor;
-                if (color && color !== 'transparent' && color !== 'rgba(0, 0, 0, 0)') {
-                    const x = (index % size) * scale;
-                    const y = Math.floor(index / size) * scale;
-                    ctx.fillStyle = color;
-                    ctx.fillRect(x, y, scale, scale);
+            const exCtx = exportCanvas.getContext('2d');
+            
+            for (let i = 0; i < pixelData.length; i++) {
+                if (pixelData[i]) {
+                    const x = (i % size) * scale;
+                    const y = Math.floor(i / size) * scale;
+                    exCtx.fillStyle = pixelData[i];
+                    exCtx.fillRect(x, y, scale, scale);
                 }
-            });
+            }
             return exportCanvas.toDataURL('image/png');
         }
 
         document.getElementById('btn-export').addEventListener('click', () => {
             const link = document.createElement('a');
-            link.download = `PixelPaper_${sizePicker.value}x${sizePicker.value}.png`;
-            link.href = generatePNGDataURL(parseInt(sizePicker.value));
+            link.download = `PixelPaper_${size}x${size}.png`;
+            link.href = generateHighResPNG();
             link.click();
         });
 
         document.getElementById('btn-clear').addEventListener('click', () => {
             if(confirm('Clear the canvas?')) {
-                saveState(); // Save state before clearing so you can undo the clear!
-                initCanvas(null, currentArtId);
+                saveState(); 
+                pixelData.fill(null);
+                renderCanvas();
             }
         });
 
         sizePicker.addEventListener('change', () => {
             if(confirm('Changing size clears your current art. Proceed?')) initCanvas();
+            else sizePicker.value = size;
         });
 
-        // Run on load
+        const btnFullscreen = document.getElementById('btn-fullscreen');
+        btnFullscreen.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => console.log(err));
+            } else {
+                document.exitFullscreen();
+            }
+        });
+
         initCanvas();
         loadGallery();
     </script>
